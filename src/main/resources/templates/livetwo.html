@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:pages="http://www.w3.org/1999/xhtml">
+<head>
+    <title>antonsyzkogeotracker</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8;width=device-width, initial-scale=1" />
+    <!--<script src="http://maps.googleapis.com/maps/api/js"></script>-->
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQU8QZwcbZBtiUWbFkLJAysT9_wWuo68s"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.googlemap/1.5/jquery.googlemap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.googlemap/1.5/jquery.googlemap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script  src="//code.jquery.com/jquery.js"></script>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.min.js"></script>
+    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/fusioncharts.js"></script>
+    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.fint.js?cacheBust=56"></script>
+    <script type="text/javascript"
+            src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script
+            src="http://cdn.crunchify.com/wp-content/uploads/code/jquery.sparkline.js"></script>
+
+    <script type="text/javascript">
+        function chartSparkline() {
+            $.ajax({
+                url : 'sparklinetest.html',
+                dataType : "json",
+                cache : false,
+                contentType : 'application/json; charset=utf-8',
+                type : 'GET',
+                success : function(result) {
+                    var one = result.sparkData;
+                    //alert(one);
+                    consumeJSONData(one);
+                }
+            });
+        };
+
+        function consumeJSONData(sparkData) {
+            console.log(sparkData);
+            for ( var i = 0; i < sparkData.length; i++) {
+                var obj = sparkData[i];
+                var crunchifyName;
+                var crunchifyValue;
+                for ( var key in obj) {
+                    crunchifyName = key;
+                    crunchifyValue = obj[key].toString();
+                    crunchifyValue = crunchifyValue.substr(1);
+                    crunchifyValue = crunchifyValue.substring(0,
+                            crunchifyValue.length - 1);
+                    var n = crunchifyValue.split(",");
+                    console.log(n);
+                    $("#" + crunchifyName).sparkline(n, {
+                        type : 'line',
+                        width : '200',
+                        fillColor : '#eeeeee'
+                    });
+                }
+            }
+        };
+    </script>
+
+    <script type="text/javascript">
+        var intervalId = 0;
+        intervalId = setInterval(chartSparkline, 3000);
+    </script>
+
+    <script type="text/javascript" th:inline="javascript">
+        function londonTweets() {
+            $.ajax({
+                url : 'london.html',
+                success : function(data) {
+                    $('#result2').html(data);
+                }
+            });
+        };
+        function randomAjax3() {
+            $.ajax({
+                url : 'liveRandomTW.html',
+                success : function(data) {
+                    $('#result3').html(data);
+                }
+            });
+        }
+    </script>
+    <script type="text/javascript" th:inline="javascript">
+        var intervalTW = 0;
+        intervalTW = setInterval(londonTweets,10000);
+        var intervalRandom = 0;
+
+        intervalRandom = setInterval(randomAjax3,1000);
+
+    </script>
+
+
+<script type="text/javascript"   th:inline="javascript">
+    var liveRandom = [[${liveRandom}]];
+
+        $(function () {
+
+            $(document).ready(function () {
+                Highcharts.setOptions({
+                    global: {
+                        useUTC: false
+                    }
+                });
+
+                Highcharts.chart('container', {
+                    chart: {
+                        type: 'spline',
+                        animation: Highcharts.svg, // don't animate in old IE
+                        marginRight: 10,
+                        events: {
+                            load: function () {
+
+                                // set up the updating of the chart each second
+                                var series = this.series[0];
+                                setInterval(function () {
+                                    var x = (new Date()).getTime(), // current time
+                                   //   y = Math.random();
+                                           y = liveRandom;
+                                    series.addPoint([x, y], true, true);
+                                }, 1000*10);
+                            }
+                        }
+                    },
+                    title: {
+                        text: 'Live random data'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        tickPixelInterval: 150
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Value'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.name + '</b><br/>' +
+                                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                                    Highcharts.numberFormat(this.y, 2);
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    exporting: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Random data',
+                        data: (function () {
+                            // generate an array of random data
+                            var data = [],
+                                    time = (new Date()).getTime(),
+                                    i;
+
+                            for (i = -19; i <= 0; i += 1) {
+                                data.push({
+                                    x: time + i * 1000,
+                                     y: Math.random()
+                                   // y:liveRandom
+                                });
+                            }
+                            return data;
+                        }())
+                    }]
+                });
+            });
+        });
+
+
+</script>
+    <script type="text/javascript"   th:inline="javascript">
+        var liveRandom = [[${liveRandom}]];
+
+
+
+            window.onload = function () {
+
+
+
+
+            var dps = []; // dataPoints
+
+            var chart = new CanvasJS.Chart("chartContainer",{
+                title :{
+                    text: "Live Random Data"
+                },
+                data: [{
+                    type: "line",
+                    dataPoints: dps
+                }]
+            });
+
+            var xVal = 0;
+            var yVal = 100;
+            var updateInterval = 100;
+            var dataLength = 500; // number of dataPoints visible at any point
+
+            var updateChart = function (count) {
+                count = count || 1;
+                // count is number of times loop runs to generate random dataPoints.
+
+                for (var j = 0; j < count; j++) {
+                    yVal = yVal +  Math.round(5 + Math.random() *(-5-5));
+                    dps.push({
+                        x: xVal,
+                        y: yVal
+                      //  y:liveRandom
+                    });
+                    xVal++;
+                };
+                if (dps.length > dataLength)
+                {
+                    dps.shift();
+                }
+
+                chart.render();
+
+            };
+
+            // generates first set of dataPoints
+            updateChart(dataLength);
+
+            // update chart after specified time.
+            setInterval(function(){updateChart()}, updateInterval);
+
+        }
+    </script>
+    <script type="text/javascript"   th:inline="javascript">
+        var liveRandom = [[${liveRandom}]];
+
+
+            FusionCharts.ready(
+
+
+                    function () {
+
+            var transactionChart = new FusionCharts({
+                id: "mychart",
+                type: 'realtimecolumn',
+                renderAt: 'chart-container',
+                width: '600',
+                height: '250',
+                dataFormat: 'json',
+                dataSource: {
+                    "chart": {
+                        "caption": "Data  per 10 seconds",
+                        "subCaption": "Data.com",
+                        "showrealtimevalue": "1",
+                        "yaxismaxvalue": "10",
+                        "numdisplaysets": "10",
+
+                        "labeldisplay": "rotate",
+                        "slantLabels": "1",
+                        "showLegend":"0",
+                        "showValues": "0",
+                        "numbersuffix": " Transactions",
+                        "showlabels": "1",
+                        "showRealTimeValue": "0",
+
+                        //Cosmetics
+                        "paletteColors" : "#0075c2,#1aaf5d",
+                        "baseFontColor" : "#333333",
+                        "baseFont" : "Helvetica Neue,Arial",
+                        "captionFontSize" : "14",
+                        "subcaptionFontSize" : "14",
+                        "subcaptionFontBold" : "0",
+                        "showBorder" : "0",
+                        "bgColor" : "#ffffff",
+                        "showShadow" : "0",
+                        "canvasBgColor" : "#ffffff",
+                        "canvasBorderAlpha" : "0",
+                        "divlineAlpha" : "100",
+                        "divlineColor" : "#999999",
+                        "divlineThickness" : "1",
+                        "divLineIsDashed" : "1",
+                        "divLineDashLen" : "1",
+                        "divLineGapLen" : "1",
+                        "usePlotGradientColor" : "0",
+                        "showplotborder" : "0",
+                        "valueFontColor" : "#ffffff",
+                        "placeValuesInside" : "1",
+                        "rotateValues" : "1",
+                        "showXAxisLine" : "1",
+                        "xAxisLineThickness" : "1",
+                        "xAxisLineColor" : "#999999",
+                        "showAlternateHGridColor" : "0",
+                        "legendBgAlpha" : "0",
+                        "legendBorderAlpha" : "0",
+                        "legendShadow" : "0",
+                        "legendItemFontSize" : "10",
+                        "legendItemFontColor" : "#666666"
+                    },
+                    "categories": [
+                        {
+                            "category": [
+                                { "label": "Start" }
+                            ]
+                        }
+                    ],
+                    "dataset": [
+                        {
+                            "seriesname": "",
+                            "alpha": "100",
+                            "data": [
+                                { "value": "3" }
+                            ]
+                        }
+                    ]
+                },
+                "events" : {
+                    "initialized" : function(evt, arg){
+                        //Format minutes, seconds by adding 0 prefix accordingly
+                        function formatTime(time){
+                            (time < 10) ? (time = "0"+time) : (time = time);
+                            return time;
+                        }
+                        //Update Data method
+                        function updateData() {
+
+                            //Get reference to the chart using its ID
+                            var chartRef = FusionCharts("mychart"),
+                            //We need to create a querystring format incremental update, containing
+                            //label in hh:mm:ss format
+                            //and a value (random).
+                                    currDate = new Date(),
+                                    label = formatTime(currDate.getHours()) + ":" + formatTime(currDate.getMinutes()) + ":" + formatTime(currDate.getSeconds()),
+                            //Get random number between 1 & 5 - rounded
+                                   transactions = Math.round(Math.random() * 4) + 1,
+                                  //  transactions = liveRandom,
+                                    strData = "&label=" + label + "&value=" + transactions;
+                            //Feed it to chart.
+                            chartRef.feedData(strData);
+                        }
+                        //Interval
+                        var myVar = setInterval(function () {
+                            updateData();
+
+                        }, 10000);
+                    }
+                }
+            });
+
+            transactionChart.render();
+        });
+    </script>
+
+
+
+
+
+
+</head>
+<body>
+
+<h6> AJAX DATA 3 sec SPARKS </h6>
+Sparkline One: &nbsp;&nbsp;&nbsp;&nbsp;<span id="one">.</span>
+
+<h6> TWEETS PER 10 SECONDS </h6>
+<div id="result2">
+</div>
+<h6>AJAX RANDOM</h6>
+<div id="result3"></div>
+
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+
+
+<div id="chartContainer" style="height: 300px; width:100%;">
+</div>
+
+
+<div id="chart-container">FusionCharts will render here</div>
+
+
+</div>
+</body>
+</html>

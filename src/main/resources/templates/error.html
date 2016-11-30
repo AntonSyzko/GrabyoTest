@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:pages="https://www.w3.org/1999/xhtml">
+<head>
+    <title>Error page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8;width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+    <script th:inline="javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Raleway:400,300,600" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/4.0.0/normalize.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/w3.css" th:hrer="@{/static/css/w3.css}" />
+
+</head>
+<body>
+<!--/*/ <th:block th:include="fragments/headermainpage :: header"></th:block> /*/-->
+<h1 th:text="${errorCode}">404</h1>
+<h1 th:text="${param.error}">404</h1>
+<p th:text="${errorMessage}">Error java.lang.NullPointerException</p>
+<p th:text="${error}"></p>
+
+<div class="container" style="text-align: center">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row center-block">
+                <h1>
+                    Oops!</h1>
+                <h2>
+                    404 Not Found</h2>
+                <div class="row center-block">
+                    Sorry, an error has occured, Requested page not found!
+                </div>
+                <div class="row center-block">
+                    <a href="tasks.html" th:href="@{/}" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span>
+                        Take Me Home To GRABYO TEST  </a>
+                </div>
+            </div>
+        </div>
+
+</body>
+</html>
